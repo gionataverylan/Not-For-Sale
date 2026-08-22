@@ -5,7 +5,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float speed = 8f;
     [SerializeField] private float velocity = -2f;
     [SerializeField] private float gravity = -9.81f;
-    
+    [SerializeField] private float sensitivity = 0.4f;
+    [SerializeField] private float pitch = 0f;
+    [SerializeField] private Transform cameraTarget;
+
     private PlayerControler playerControler;
     private CharacterController characterController;
 
@@ -30,6 +33,11 @@ public class PlayerMovement : MonoBehaviour
         OnMove();
     }
 
+    private void LateUpdate()
+    {
+        Look();
+    }
+
     private void OnMove()
     {
         Vector2 input = playerControler.Movement.Move.ReadValue<Vector2>();
@@ -52,5 +60,17 @@ public class PlayerMovement : MonoBehaviour
         }
 
         return velocity;
+    }
+
+    private void Look()
+    {
+        Vector2 look = playerControler.Movement.Look.ReadValue<Vector2>();
+
+        transform.Rotate(Vector3.up * look.x * sensitivity);
+
+        pitch -= look.y * sensitivity;
+        pitch = Mathf.Clamp(pitch, -80f, 80);
+
+        cameraTarget.localEulerAngles = new Vector3(pitch, 0f, 0f);
     }
 }
