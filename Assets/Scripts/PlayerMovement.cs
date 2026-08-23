@@ -10,9 +10,17 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float pitch = 0f;
     [SerializeField] private float jumpForce = 8f;
     [SerializeField] private float jumpBuffer = 0.2f;
+    [SerializeField] private float bobSmoothSpeed = 8f;
+    [SerializeField] private float bobFrequency = 8f;
+    [SerializeField] private float rollAmplitude = 1f;
+    [SerializeField] private float pitchAmplitude = 1f;
     [SerializeField] private Transform cameraTarget;
 
+
     private float jumpBufferCounter;
+    private float timer;
+    private float currentRoll;
+    private float currentBobPitch;
 
     private PlayerControler playerControler;
     private CharacterController characterController;
@@ -88,17 +96,38 @@ public class PlayerMovement : MonoBehaviour
     private void Look()
     {
         Vector2 look = playerControler.Movement.Look.ReadValue<Vector2>();
+        Vector2 move = playerControler.Movement.Move.ReadValue<Vector2>();
 
         transform.Rotate(Vector3.up * look.x * sensitivity);
 
         pitch -= look.y * sensitivity;
         pitch = Mathf.Clamp(pitch, -80f, 80);
 
-        cameraTarget.localEulerAngles = new Vector3(pitch, 0f, 0f);
+        bool isMoving = characterController.isGrounded && move.magnitude > 0.01f;
+        BobHead(isMoving);
+
+        cameraTarget.localEulerAngles = new Vector3(pitch + currentBobPitch, 0f, currentRoll);
     }
 
     private void UpdateTimers()
     {
         jumpBufferCounter -= Time.deltaTime;
+    }
+
+    private void BobHead(bool isMoving)
+    {
+        float targetRoll = 0f;
+        float targetBobPitch = 0f;
+
+        if (isMoving)
+        {
+            timer += Time.deltaTime * bobFrequency;
+
+            targetRoll = Mathf.Sin(timer) * rollAmplitude;
+            targetBobPitch = Mathf.Cos(timer * 2) * pitchAmplitude;
+        }
+
+        currentRoll = Mathf.Lerp(currentRoll, targetRoll, Time.deltaTime * bobSmoothSpeed);
+        currentBobPitch = Mathf.Lerp(currentBobPitch, targetBobPitch, Time.deltaTime * bobSmoothSpeed);
     }
 }

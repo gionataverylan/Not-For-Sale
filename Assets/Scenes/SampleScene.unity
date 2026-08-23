@@ -1077,6 +1077,12 @@ MonoBehaviour:
   gravity: -9.81
   sensitivity: 0.1
   pitch: 0
+  jumpForce: 8
+  jumpBuffer: 0.2
+  bobSmoothSpeed: 8
+  bobFrequency: 8
+  rollAmplitude: 0.5
+  pitchAmplitude: 0.5
   cameraTarget: {fileID: 259489215}
 --- !u!143 &1819801387
 CharacterController:
