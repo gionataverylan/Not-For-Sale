@@ -9,7 +9,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float sensitivity = 0.4f;
     [SerializeField] private float pitch = 0f;
     [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private Transform cameraTarget;
+
+    private float jumpBufferCounter;
 
     private PlayerControler playerControler;
     private CharacterController characterController;
@@ -34,7 +37,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        UpdateTimers();
         OnMove();
+        TryJump();
     }
 
     private void LateUpdate()
@@ -54,9 +59,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        if (characterController.isGrounded)
+        jumpBufferCounter = jumpBuffer;
+    }
+
+    private void TryJump()
+    {
+        if (characterController.isGrounded && jumpBufferCounter > 0)
         {
             velocity = jumpForce;
+            jumpBufferCounter = 0f;
         }
     }
 
@@ -84,5 +95,10 @@ public class PlayerMovement : MonoBehaviour
         pitch = Mathf.Clamp(pitch, -80f, 80);
 
         cameraTarget.localEulerAngles = new Vector3(pitch, 0f, 0f);
+    }
+
+    private void UpdateTimers()
+    {
+        jumpBufferCounter -= Time.deltaTime;
     }
 }
