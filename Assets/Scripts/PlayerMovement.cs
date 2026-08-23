@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float sensitivity = 0.4f;
     [SerializeField] private float pitch = 0f;
+    [SerializeField] private float jumpForce = 8f;
     [SerializeField] private Transform cameraTarget;
 
     private PlayerControler playerControler;
@@ -21,11 +23,13 @@ public class PlayerMovement : MonoBehaviour
     private void OnEnable()
     {
         playerControler.Movement.Enable();
+        playerControler.Movement.Jump.performed += OnJump;
     }
 
     private void OnDisable()
     {
         playerControler.Movement.Disable();
+        playerControler.Movement.Jump.performed -= OnJump;
     }
 
     private void Update()
@@ -46,6 +50,14 @@ public class PlayerMovement : MonoBehaviour
         direction.y = ApplyGravity() * Time.deltaTime;
 
         characterController.Move(direction);
+    }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        if (characterController.isGrounded)
+        {
+            velocity = jumpForce;
+        }
     }
 
     private float ApplyGravity()
