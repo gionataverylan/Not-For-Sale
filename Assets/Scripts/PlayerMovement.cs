@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float speed = 8f;
+    [SerializeField] private float sprintSpeed = 12f;
     [SerializeField] private float velocity = -2f;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float sensitivity = 0.4f;
@@ -58,7 +59,11 @@ public class PlayerMovement : MonoBehaviour
     private void OnMove()
     {
         Vector2 input = playerControler.Movement.Move.ReadValue<Vector2>();
-        Vector3 direction = (transform.right * input.x + transform.forward * input.y) * speed * Time.deltaTime;
+        bool isSprinting = playerControler.Movement.Sprint.IsPressed();
+        
+        float newSpeed = isSprinting && input.y > 0 && characterController.isGrounded ? sprintSpeed : speed;
+
+        Vector3 direction = (transform.right * input.x + transform.forward * input.y) * newSpeed * Time.deltaTime;
 
         direction.y = ApplyGravity() * Time.deltaTime;
 
