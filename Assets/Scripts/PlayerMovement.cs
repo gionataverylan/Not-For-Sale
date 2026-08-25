@@ -9,19 +9,21 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float sensitivity = 0.4f;
     [SerializeField] private float pitch = 0f;
-    [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private float jumpForce = 6f;
+    [SerializeField] private float sprintJumpMultiplier = 10f;
     [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private float bobSmoothSpeed = 8f;
     [SerializeField] private float bobFrequency = 8f;
     [SerializeField] private float rollAmplitude = 1f;
     [SerializeField] private float pitchAmplitude = 1f;
+    [SerializeField] private float sprintBobMultiplier = 1.5f;
     [SerializeField] private Transform cameraTarget;
-
 
     private float jumpBufferCounter;
     private float timer;
     private float currentRoll;
     private float currentBobPitch;
+    private bool isSprinting;
 
     private PlayerControler playerControler;
     private CharacterController characterController;
@@ -59,9 +61,11 @@ public class PlayerMovement : MonoBehaviour
     private void OnMove()
     {
         Vector2 input = playerControler.Movement.Move.ReadValue<Vector2>();
-        bool isSprinting = playerControler.Movement.Sprint.IsPressed();
-        
-        float newSpeed = isSprinting && input.y > 0 && characterController.isGrounded ? sprintSpeed : speed;
+        bool sprintPressed = playerControler.Movement.Sprint.IsPressed();
+
+        isSprinting = sprintPressed && input.y > 0 && characterController.isGrounded;
+
+        float newSpeed = isSprinting ? sprintSpeed : speed;
 
         Vector3 direction = (transform.right * input.x + transform.forward * input.y) * newSpeed * Time.deltaTime;
 
@@ -77,9 +81,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void TryJump()
     {
+        float multiJump = isSprinting ? sprintJumpMultiplier : jumpForce;
+
         if (characterController.isGrounded && jumpBufferCounter > 0)
         {
-            velocity = jumpForce;
+            velocity = multiJump;
             jumpBufferCounter = 0f;
         }
     }
@@ -124,12 +130,14 @@ public class PlayerMovement : MonoBehaviour
         float targetRoll = 0f;
         float targetBobPitch = 0f;
 
+        float multiBobHead = isSprinting ? sprintBobMultiplier : 1f;
+
         if (isMoving)
         {
-            timer += Time.deltaTime * bobFrequency;
+            timer += Time.deltaTime * bobFrequency * multiBobHead;
 
-            targetRoll = Mathf.Sin(timer) * rollAmplitude;
-            targetBobPitch = Mathf.Cos(timer * 2) * pitchAmplitude;
+            targetRoll = Mathf.Sin(timer) * rollAmplitude * multiBobHead;
+            targetBobPitch = Mathf.Cos(timer * 2) * pitchAmplitude * multiBobHead;
         }
 
         currentRoll = Mathf.Lerp(currentRoll, targetRoll, Time.deltaTime * bobSmoothSpeed);
