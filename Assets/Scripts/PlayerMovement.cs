@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     private float currentRoll;
     private float currentBobPitch;
     private bool isSprinting;
+    private float airborneSpeed;
 
     private PlayerControler playerControler;
     private CharacterController characterController;
@@ -66,8 +67,9 @@ public class PlayerMovement : MonoBehaviour
         isSprinting = sprintPressed && input.y > 0 && characterController.isGrounded;
 
         float newSpeed = isSprinting ? sprintSpeed : speed;
+        float horizontalSpeed = characterController.isGrounded == false ? airborneSpeed : newSpeed;
 
-        Vector3 direction = (transform.right * input.x + transform.forward * input.y) * newSpeed * Time.deltaTime;
+        Vector3 direction = (transform.right * input.x + transform.forward * input.y) * horizontalSpeed * Time.deltaTime;
 
         direction.y = ApplyGravity() * Time.deltaTime;
 
@@ -81,11 +83,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void TryJump()
     {
-        float multiJump = isSprinting ? sprintJumpMultiplier : jumpForce;
-
         if (characterController.isGrounded && jumpBufferCounter > 0)
         {
-            velocity = multiJump;
+            velocity = isSprinting ? sprintJumpMultiplier : jumpForce;
+            airborneSpeed = isSprinting ? sprintSpeed : speed;
             jumpBufferCounter = 0f;
         }
     }
