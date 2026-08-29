@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float rollAmplitude = 1f;
     [SerializeField] private float pitchAmplitude = 1f;
     [SerializeField] private float sprintBobMultiplier = 1.5f;
+    [SerializeField] private float fallMultiplier = 1.5f;
     [SerializeField] private Transform cameraTarget;
 
     private float jumpBufferCounter;
@@ -93,13 +94,15 @@ public class PlayerMovement : MonoBehaviour
 
     private float ApplyGravity()
     {
+
         if (characterController.isGrounded && velocity < 0)
         {
             velocity = -2f;
         }
         else
         {
-            velocity += gravity * Time.deltaTime;
+            float newGravity = velocity <= 0 ? fallMultiplier * gravity : gravity;
+            velocity += newGravity * Time.deltaTime;
         }
 
         return velocity;
