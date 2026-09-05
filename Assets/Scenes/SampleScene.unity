@@ -1073,16 +1073,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   speed: 5
+  sprintSpeed: 12
   velocity: -2
   gravity: -9.81
   sensitivity: 0.1
   pitch: 0
   jumpForce: 8
+  sprintJumpMultiplier: 10
   jumpBuffer: 0.2
   bobSmoothSpeed: 8
   bobFrequency: 8
   rollAmplitude: 0.5
   pitchAmplitude: 0.5
+  sprintBobMultiplier: 1.5
+  fallMultiplier: 2
   cameraTarget: {fileID: 259489215}
 --- !u!143 &1819801387
 CharacterController:
@@ -1287,7 +1291,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 9dc8a3e3aabbd774ea5c7b613feeb626, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
