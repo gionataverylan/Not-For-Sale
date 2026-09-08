@@ -1074,6 +1074,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   speed: 5
   sprintSpeed: 12
+  dashSpeed: 12
   velocity: -2
   gravity: -9.81
   sensitivity: 0.1
@@ -1081,6 +1082,7 @@ MonoBehaviour:
   jumpForce: 8
   sprintJumpMultiplier: 10
   jumpBuffer: 0.2
+  dashTimer: 0.15
   bobSmoothSpeed: 8
   bobFrequency: 8
   rollAmplitude: 0.5

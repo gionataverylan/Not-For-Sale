@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float pitchAmplitude = 1f;
     [SerializeField] private float sprintBobMultiplier = 1.5f;
     [SerializeField] private float fallMultiplier = 1.5f;
+    [SerializeField] private float dashCooldown = 0.35f;
     [SerializeField] private Transform cameraTarget;
 
     private float jumpBufferCounter;
@@ -29,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isSprinting;
     private float airborneSpeed;
     private float dashTimerCounter;
+    private float dashCooldownCounter;
     private Vector3 dashDirection;
 
     private PlayerControler playerControler;
@@ -95,16 +97,21 @@ public class PlayerMovement : MonoBehaviour
     private void OnDash(InputAction.CallbackContext context)
     {
         Vector2 input = playerControler.Movement.Move.ReadValue<Vector2>();
-        dashTimerCounter = dashTimer;
 
-        if (input.sqrMagnitude > 0.01f && characterController.isGrounded)
+        if(dashCooldownCounter <= 0)
         {
-            dashDirection = (transform.right * input.x + transform.forward * input.y).normalized;
-        }
-        else
-        {
-            dashDirection = transform.forward;
-        }
+            dashTimerCounter = dashTimer;
+            dashCooldownCounter = dashCooldown;
+
+            if (input.sqrMagnitude > 0.01f && characterController.isGrounded)
+            {
+                dashDirection = (transform.right * input.x + transform.forward * input.y).normalized;
+            }
+            else
+            {
+                dashDirection = transform.forward;
+            }
+        }  
     }
 
     private void TryJump()
@@ -153,6 +160,7 @@ public class PlayerMovement : MonoBehaviour
     {
         jumpBufferCounter -= Time.deltaTime;
         dashTimerCounter -= Time.deltaTime;
+        dashCooldownCounter -= Time.deltaTime;
     }
 
     private void BobHead(bool isMoving)
