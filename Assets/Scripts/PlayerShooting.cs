@@ -3,11 +3,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerShooting : MonoBehaviour
 {
-    private Vector3 origin;
-    private Vector3 direction;
+    [SerializeField] private int damageAmount = 50;
+
     private new Camera camera;
     private PlayerCombat playerCombat;
-    //private RaycastHit hit;
     private Ray ray;
 
     private void Awake()
@@ -37,9 +36,13 @@ public class PlayerShooting : MonoBehaviour
     private void Shoot(InputAction.CallbackContext context)
     {
         RaycastHit hit;
+
         if(Physics.Raycast(ray, out hit))
         {
-            Debug.Log(hit.transform.name);
+            if (hit.transform.TryGetComponent<IDamageable>(out IDamageable damageable))
+            {
+                damageable.TakeDamage(damageAmount);
+            }
         }
         else
         {
