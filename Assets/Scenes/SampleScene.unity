@@ -710,10 +710,10 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 8
-  m_Acceleration: 8
+  m_Acceleration: 50
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 2
+  m_StoppingDistance: 0.5
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -734,6 +734,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   target: {fileID: 1819801385}
+  attackRange: 3
+  attackCooldown: 2
+  damage: 25
 --- !u!114 &430612650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -746,7 +749,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c406bfa8eb71ee409a23408db924262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  currentHealth: 100
 --- !u!1 &525944356
 GameObject:
   m_ObjectHideFlags: 0
@@ -1146,6 +1148,7 @@ GameObject:
   - component: {fileID: 1819801387}
   - component: {fileID: 1819801386}
   - component: {fileID: 1819801388}
+  - component: {fileID: 1819801389}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1238,7 +1241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92b230e49dc6d8c4283b95a857d90847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  speed: 5
+  speed: 8
   sprintSpeed: 12
   dashSpeed: 12
   velocity: -2
@@ -1295,6 +1298,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShooting
   damageAmount: 50
+--- !u!114 &1819801389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819801381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d6f263cae32d9f4da9bd56916ff659d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
 --- !u!1 &1866507799
 GameObject:
   m_ObjectHideFlags: 0

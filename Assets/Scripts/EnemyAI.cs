@@ -5,12 +5,16 @@ using UnityEngine.AI;
 public class EnemyAI : MonoBehaviour
 {
     [SerializeField] private Transform target;
-    [SerializeField] private float attackRange = 2f;
+    [SerializeField] private float attackRange = 3f;
+    [SerializeField] private float attackCooldown = 2f;
+
+    [SerializeField] private int damage = 25;
 
     private enum EnemyState { Chase, Attack, Death };
     private EnemyState currentState = EnemyState.Chase;
     private NavMeshAgent agent;
     private EnemyHealth enemyHealth;
+    private float attackCooldownCounter;
 
     private void Awake()
     {
@@ -42,18 +46,35 @@ public class EnemyAI : MonoBehaviour
     {
         agent.SetDestination(target.position);
 
-        if(Vector3.Distance(transform.position, target.position) <= attackRange)
+        float dist = Vector3.Distance(transform.position, target.position);
+        Debug.Log("Дистанция: " + dist);
+
+        if (Vector3.Distance(transform.position, target.position) <= attackRange)
         {
             currentState = EnemyState.Attack;
+            agent.isStopped = true;
         }
     }
 
     private void AttackState()
     {
-        if (Vector3.Distance(transform.position, transform.position) > attackRange)
+        if (Vector3.Distance(transform.position, target.position) > attackRange)
         {
-            currentState |= EnemyState.Attack;
+            currentState = EnemyState.Chase;
+            agent.isStopped = false;
             return;
+        }
+
+        attackCooldownCounter -= Time.deltaTime;
+
+        if (attackCooldownCounter <= 0)
+        {
+            if (target.TryGetComponent<IDamageable>(out IDamageable damageable))
+            {
+                damageable.TakeDamage(damage);
+            }
+
+            attackCooldownCounter = attackCooldown; 
         }
     }
 
