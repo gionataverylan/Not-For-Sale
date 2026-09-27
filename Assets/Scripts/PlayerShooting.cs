@@ -8,23 +8,27 @@ public class PlayerShooting : MonoBehaviour
     private new Camera camera;
     private PlayerCombat playerCombat;
     private Ray ray;
+    private PlayerHealth playerHealth;
 
     private void Awake()
     {
         camera = Camera.main;
         playerCombat = new PlayerCombat();
+        playerHealth = GetComponent<PlayerHealth>();
     }
 
     private void OnEnable()
     {
         playerCombat.Attack.Enable();
         playerCombat.Attack.Fire.performed += Shoot;
+        playerHealth.onDeath += HandleDeath;
     }
 
     private void OnDisable()
     {
         playerCombat.Attack.Disable();
         playerCombat.Attack.Fire.performed -= Shoot;
+        playerHealth.onDeath -= HandleDeath;
     }
 
     private void Update()
@@ -49,5 +53,11 @@ public class PlayerShooting : MonoBehaviour
             Debug.Log("miss");
         }
 
+    }
+
+    private void HandleDeath()
+    {
+        this.enabled = false;
+        Debug.Log("Смерть игрока");
     }
 }
