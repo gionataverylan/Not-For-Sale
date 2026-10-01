@@ -151,6 +151,8 @@ public class PlayerMovement : MonoBehaviour
         return velocity;
     }
 
+    
+
     private void Look()
     {
         Vector2 look = playerControler.Movement.Look.ReadValue<Vector2>();
