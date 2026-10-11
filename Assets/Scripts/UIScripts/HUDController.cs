@@ -11,12 +11,13 @@ public class HUDController : MonoBehaviour
     {
         document = GetComponent<UIDocument>();
         playerHealth = FindFirstObjectByType<PlayerHealth>();
+        healthBar = document.rootVisualElement.Q<ProgressBar>("HealthBar");
+
+        healthBar.value = playerHealth.initialHealth;
     }
 
     private void OnEnable()
     {
-        healthBar = document.rootVisualElement.Q<ProgressBar>("HealthBar");
-
         playerHealth.onHealthChanged += HandleChangeHP;
     }
 

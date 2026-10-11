@@ -3,10 +3,16 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
-    private int currentHealth = 100;
+    public int initialHealth { get; } = 100;
+    private int currentHealth;
     private bool isDead;
     public event Action onDeath;
     public event Action<int> onHealthChanged;
+
+    private void Awake()
+    {
+        currentHealth = initialHealth;
+    }
 
     public void TakeDamage(int amount)
     {
