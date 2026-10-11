@@ -336,6 +336,8 @@ MonoBehaviour:
   - {fileID: 556938743}
   - {fileID: 1921974636}
   target: {fileID: 1819801385}
+  enemyCount: 10
+  spawnInterval: 2
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0

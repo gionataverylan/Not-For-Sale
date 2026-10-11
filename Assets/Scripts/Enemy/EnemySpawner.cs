@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -5,10 +6,12 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] GameObject enemy;
     [SerializeField] Transform[] spawnPoints;
     [SerializeField] private Transform target;
+    [SerializeField] private int enemyCount;
+    [SerializeField] private float spawnInterval;
 
     private void Start()
     {
-        CreateEnemy();
+        StartCoroutine(Spawn());
     }
 
     private Transform ChoosePosition()
@@ -22,5 +25,14 @@ public class EnemySpawner : MonoBehaviour
         GameObject enemyItem = Instantiate(enemy, point.position, point.rotation);
         EnemyAI enemyAI = enemyItem.GetComponent<EnemyAI>();
         enemyAI.SetTarget(target);
+    }
+
+    private IEnumerator Spawn()
+    {
+        for(int i = 0; i < enemyCount; i++)
+        {
+            yield return new WaitForSeconds(spawnInterval);
+            CreateEnemy();
+        }
     }
 }
