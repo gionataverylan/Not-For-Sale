@@ -1,10 +1,9 @@
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    [SerializeField] private Transform target;
+    private Transform target;
     [SerializeField] private float attackRange = 3f;
     [SerializeField] private float attackCooldown = 2f;
 
@@ -47,7 +46,6 @@ public class EnemyAI : MonoBehaviour
         agent.SetDestination(target.position);
 
         float dist = Vector3.Distance(transform.position, target.position);
-        Debug.Log("Дистанция: " + dist);
 
         if (Vector3.Distance(transform.position, target.position) <= attackRange)
         {
@@ -84,6 +82,10 @@ public class EnemyAI : MonoBehaviour
 
         agent.enabled = false;
         Destroy(gameObject);
-        Debug.Log("Death");
+    }
+
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
     }
 }
