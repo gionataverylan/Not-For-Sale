@@ -7,33 +7,25 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float dashSpeed = 20f;
     [SerializeField] private float velocity = -2f;
     [SerializeField] private float gravity = -9.81f;
-    [SerializeField] private float sensitivity = 0.4f;
-    [SerializeField] private float pitch = 0f;
     [SerializeField] private float jumpForce = 6f;
     [SerializeField] private float sprintJumpMultiplier = 10f;
     [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private float dashTimer = 0.15f;
-    [SerializeField] private float bobSmoothSpeed = 8f;
-    [SerializeField] private float bobFrequency = 8f;
-    [SerializeField] private float rollAmplitude = 1f;
-    [SerializeField] private float pitchAmplitude = 1f;
-    [SerializeField] private float sprintBobMultiplier = 1.5f;
     [SerializeField] private float fallMultiplier = 1.5f;
     [SerializeField] private float dashCooldown = 0.35f;
-    [SerializeField] private Transform cameraTarget;
 
     private float jumpBufferCounter;
-    private float timer;
-    private float currentRoll;
-    private float currentBobPitch;
-    private bool isSprinting;
     private float airborneSpeed;
     private float dashTimerCounter;
     private float dashCooldownCounter;
+    private bool isSprinting;
     private Vector3 dashDirection;
 
     private CharacterController characterController;
     private PlayerInputReader playerInputReader;
+
+    public bool IsGrounded => characterController.isGrounded;
+    public bool IsSprinting => isSprinting;
 
     private void Awake()
     {
@@ -58,11 +50,6 @@ public class PlayerMovement : MonoBehaviour
         UpdateTimers();
         OnMove();
         TryJump();
-    }
-
-    private void LateUpdate()
-    {
-        Look();
     }
 
     private void OnMove()
@@ -93,7 +80,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnDash()
     {
-
         Vector2 input = playerInputReader.Move;
 
         if(dashCooldownCounter <= 0)
@@ -139,47 +125,10 @@ public class PlayerMovement : MonoBehaviour
         return velocity;
     }
 
-    
-
-    private void Look()
-    {
-        Vector2 look = playerInputReader.Look;
-        Vector2 move = playerInputReader.Move;
-
-        transform.Rotate(Vector3.up * look.x * sensitivity);
-
-        pitch -= look.y * sensitivity;
-        pitch = Mathf.Clamp(pitch, -80f, 80);
-
-        bool isMoving = characterController.isGrounded && move.magnitude > 0.01f;
-        BobHead(isMoving);
-
-        cameraTarget.localEulerAngles = new Vector3(pitch + currentBobPitch, 0f, currentRoll);
-    }
-
     private void UpdateTimers()
     {
         jumpBufferCounter -= Time.deltaTime;
         dashTimerCounter -= Time.deltaTime;
         dashCooldownCounter -= Time.deltaTime;
-    }
-
-    private void BobHead(bool isMoving)
-    {
-        float targetRoll = 0f;
-        float targetBobPitch = 0f;
-
-        float multiBobHead = isSprinting ? sprintBobMultiplier : 1f;
-
-        if (isMoving)
-        {
-            timer += Time.deltaTime * bobFrequency * multiBobHead;
-
-            targetRoll = Mathf.Sin(timer) * rollAmplitude * multiBobHead;
-            targetBobPitch = Mathf.Cos(timer * 2) * pitchAmplitude * multiBobHead;
-        }
-
-        currentRoll = Mathf.Lerp(currentRoll, targetRoll, Time.deltaTime * bobSmoothSpeed);
-        currentBobPitch = Mathf.Lerp(currentBobPitch, targetBobPitch, Time.deltaTime * bobSmoothSpeed);
     }
 }
