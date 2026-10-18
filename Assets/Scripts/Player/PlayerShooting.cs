@@ -48,16 +48,10 @@ public class PlayerShooting : MonoBehaviour
                 damageable.TakeDamage(damageAmount);
             }
         }
-        else
-        {
-            Debug.Log("miss");
-        }
-
     }
 
     private void HandleDeath()
     {
         this.enabled = false;
-        Debug.Log("Смерть игрока");
     }
 }

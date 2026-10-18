@@ -21,8 +21,6 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         currentHealth -= amount;
         onHealthChanged?.Invoke(currentHealth);
 
-        Debug.Log(currentHealth);
-
         if(currentHealth <= 0)
         {
             isDead = true;

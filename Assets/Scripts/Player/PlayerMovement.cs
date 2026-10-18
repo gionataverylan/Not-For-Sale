@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -31,34 +30,27 @@ public class PlayerMovement : MonoBehaviour
     private float airborneSpeed;
     private float dashTimerCounter;
     private float dashCooldownCounter;
-    private bool isDead;
     private Vector3 dashDirection;
 
-    private PlayerControler playerControler;
     private CharacterController characterController;
-    private PlayerHealth playerHealth;
+    private PlayerInputReader playerInputReader;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
-        playerControler = new PlayerControler();
-        playerHealth = GetComponent<PlayerHealth>();
+        playerInputReader = GetComponent<PlayerInputReader>();
     }
 
     private void OnEnable()
     {
-        playerControler.Movement.Enable();
-        playerControler.Movement.Jump.performed += OnJump;
-        playerControler.Movement.Dash.performed += OnDash;
-        playerHealth.onDeath += HandleDeath;
+        playerInputReader.Jumped += OnJump;
+        playerInputReader.Dashed += OnDash;
     }
 
     private void OnDisable()
     {
-        playerControler.Movement.Disable();
-        playerControler.Movement.Jump.performed -= OnJump;
-        playerControler.Movement.Dash.performed -= OnDash;
-        playerHealth.onDeath -= HandleDeath;
+        playerInputReader.Jumped -= OnJump;
+        playerInputReader.Dashed -= OnDash;
     }
 
     private void Update()
@@ -75,8 +67,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnMove()
     {
-        Vector2 input = isDead ? Vector2.zero : playerControler.Movement.Move.ReadValue<Vector2>();
-        bool sprintPressed = !isDead && playerControler.Movement.Sprint.IsPressed();
+        Vector2 input = playerInputReader.Move;
+        bool sprintPressed = playerInputReader.SprintPressed;
 
         isSprinting = sprintPressed && input.y > 0 && characterController.isGrounded;
 
@@ -94,18 +86,15 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(direction);
     }
 
-    private void OnJump(InputAction.CallbackContext context)
+    private void OnJump()
     {
-        if(isDead) return;
-
         jumpBufferCounter = jumpBuffer;
     }
 
-    private void OnDash(InputAction.CallbackContext context)
+    private void OnDash()
     {
-        if (isDead) return;
 
-        Vector2 input = playerControler.Movement.Move.ReadValue<Vector2>();
+        Vector2 input = playerInputReader.Move;
 
         if(dashCooldownCounter <= 0)
         {
@@ -125,7 +114,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void TryJump()
     {
-        if(isDead) return;
 
         if (characterController.isGrounded && jumpBufferCounter > 0)
         {
@@ -155,15 +143,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void Look()
     {
-        Vector2 look = playerControler.Movement.Look.ReadValue<Vector2>();
-        Vector2 move = isDead ? Vector2.zero : playerControler.Movement.Move.ReadValue<Vector2>();
+        Vector2 look = playerInputReader.Look;
+        Vector2 move = playerInputReader.Move;
 
         transform.Rotate(Vector3.up * look.x * sensitivity);
 
         pitch -= look.y * sensitivity;
         pitch = Mathf.Clamp(pitch, -80f, 80);
 
-        bool isMoving = !isDead && characterController.isGrounded && move.magnitude > 0.01f;
+        bool isMoving = characterController.isGrounded && move.magnitude > 0.01f;
         BobHead(isMoving);
 
         cameraTarget.localEulerAngles = new Vector3(pitch + currentBobPitch, 0f, currentRoll);
@@ -193,11 +181,5 @@ public class PlayerMovement : MonoBehaviour
 
         currentRoll = Mathf.Lerp(currentRoll, targetRoll, Time.deltaTime * bobSmoothSpeed);
         currentBobPitch = Mathf.Lerp(currentBobPitch, targetBobPitch, Time.deltaTime * bobSmoothSpeed);
-    }
-
-    private void HandleDeath()
-    {
-        isDead = true;
-        Debug.Log("Смерть игрока");
     }
 }
