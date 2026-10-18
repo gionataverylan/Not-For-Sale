@@ -23,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController characterController;
     private PlayerInputReader playerInputReader;
+    private PlayerHealth playerHealth;
 
     public bool IsGrounded => characterController.isGrounded;
     public bool IsSprinting => isSprinting;
@@ -31,18 +32,21 @@ public class PlayerMovement : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         playerInputReader = GetComponent<PlayerInputReader>();
+        playerHealth = GetComponent<PlayerHealth>();
     }
 
     private void OnEnable()
     {
         playerInputReader.Jumped += OnJump;
         playerInputReader.Dashed += OnDash;
+        playerHealth.onRespawn += ResetAfterDeath;
     }
 
     private void OnDisable()
     {
         playerInputReader.Jumped -= OnJump;
         playerInputReader.Dashed -= OnDash;
+        playerHealth.onRespawn -= ResetAfterDeath;
     }
 
     private void Update()
@@ -123,6 +127,14 @@ public class PlayerMovement : MonoBehaviour
         }
 
         return velocity;
+    }
+
+    private void ResetAfterDeath()
+    {
+        velocity = -2f;
+        dashTimerCounter = 0f;
+        dashCooldownCounter = 0f;
+        jumpBufferCounter = 0f;
     }
 
     private void UpdateTimers()

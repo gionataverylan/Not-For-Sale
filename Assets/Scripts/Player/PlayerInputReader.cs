@@ -26,6 +26,7 @@ public class PlayerInputReader : MonoBehaviour
         playerControler.Movement.Jump.performed += OnJump;
         playerControler.Movement.Dash.performed += OnDash;
         playerHealth.onDeath += HandleDeath;
+        playerHealth.onRespawn += HandleRespawn;
     }
 
     private void OnDisable()
@@ -34,6 +35,7 @@ public class PlayerInputReader : MonoBehaviour
         playerControler.Movement.Jump.performed -= OnJump;
         playerControler.Movement.Dash.performed -= OnDash;
         playerHealth.onDeath -= HandleDeath;
+        playerHealth.onRespawn -= HandleRespawn;
     }
 
     private void OnJump(InputAction.CallbackContext context)
@@ -49,6 +51,11 @@ public class PlayerInputReader : MonoBehaviour
     private void HandleDeath()
     {
         playerControler.Movement.Disable();
+    }
+
+    private void HandleRespawn()
+    {
+        playerControler.Movement.Enable();
     }
 
 }

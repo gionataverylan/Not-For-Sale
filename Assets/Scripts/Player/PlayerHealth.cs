@@ -3,15 +3,18 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
-    public int initialHealth { get; } = 100;
+    [SerializeField] private int maxHealth = 100;
+    public int MaxHealth => maxHealth;
+    public int CurrentHealth => currentHealth;
     private int currentHealth;
     private bool isDead;
     public event Action onDeath;
+    public event Action onRespawn;
     public event Action<int> onHealthChanged;
 
     private void Awake()
     {
-        currentHealth = initialHealth;
+        currentHealth = maxHealth;
     }
 
     public void TakeDamage(int amount)
@@ -26,5 +29,17 @@ public class PlayerHealth : MonoBehaviour, IDamageable
             isDead = true;
             onDeath?.Invoke();
         }
+    }
+
+    [ContextMenu("Respawn")]
+    public void Respawn()
+    {
+        if (!isDead) return;
+
+        isDead = false;
+        currentHealth = maxHealth;
+
+        onHealthChanged?.Invoke(currentHealth);
+        onRespawn?.Invoke();
     }
 }
