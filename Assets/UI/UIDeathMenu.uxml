@@ -1,7 +1,7 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/styles/Restart.uss?fileID=7433441132597879392&amp;guid=1bfb5c4c890e1cc4ba11d5c151b7f5d0&amp;type=3#Restart"/>
-    <ui:VisualElement name="Container" style="flex-grow: 1; -unity-text-align: middle-center; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: center; justify-content: center; visibility: visible; overflow: visible;">
-        <ui:Label text="YOU DIED" name="Article" style="left: auto; top: auto; right: auto; bottom: auto; -unity-text-align: middle-center; -unity-font-style: bold; -unity-text-auto-size: none; font-size: 150px; height: 176px; flex-direction: column; align-items: center; justify-content: space-around; align-self: auto; align-content: auto;"/>
-        <ui:Button text="SPAWN" name="Restart" enable-rich-text="false" style="aspect-ratio: auto; width: 250px; height: 90px; font-size: 50px; border-top-left-radius: 29px; border-top-right-radius: 29px; border-bottom-right-radius: 29px; border-bottom-left-radius: 29px; background-color: rgb(142, 24, 11); -unity-background-image-tint-color: rgb(16, 16, 16);"/>
+    <ui:VisualElement name="Container" style="flex-grow: 1; -unity-text-align: middle-center; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: center; justify-content: center; visibility: visible; overflow: visible; background-color: rgba(99, 0, 0, 0.38); align-self: stretch; padding-top: -67px; top: auto;">
+        <ui:Label text="До возрождения" name="Article" style="left: auto; top: auto; right: auto; bottom: auto; -unity-text-align: middle-center; -unity-font-style: bold; -unity-text-auto-size: none; font-size: 150px; height: 176px; flex-direction: column; align-items: center; justify-content: space-around; align-self: auto; align-content: auto;"/>
+        <ui:Label text="Label" name="Counter" focusable="true" style="font-size: 56px;"/>
     </ui:VisualElement>
 </ui:UXML>

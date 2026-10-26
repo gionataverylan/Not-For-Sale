@@ -5,30 +5,35 @@ public class UIDeathMenuController : MonoBehaviour
 {
     private UIDocument document;
     private VisualElement container;
-    private Button restartButton;
+    private Label counter;
     private PlayerHealth playerHealth;
+    private RespawnTimer timer;
 
     private void Awake()
     {
         document = GetComponent<UIDocument>();
-        restartButton = document.rootVisualElement.Q<Button>("Restart");
-        container = document.rootVisualElement.Q<VisualElement>("Container");
 
         playerHealth = FindFirstObjectByType<PlayerHealth>();
-
-        container.style.display = DisplayStyle.None;
+        timer = FindFirstObjectByType<RespawnTimer>();
     }
 
     private void OnEnable()
     {
+        counter = document.rootVisualElement.Q<Label>("Counter");
+        container = document.rootVisualElement.Q<VisualElement>("Container");
+
+        container.style.display = DisplayStyle.None;
+
         playerHealth.onDeath += ShowRestartMenu;
-        restartButton.clicked += HandleRestart;
+        playerHealth.onRespawn += HideRestartMenu;
+        timer.onCountChanged += ShowCounter;
 
     }
     private void OnDisable()
     {
         playerHealth.onDeath -= ShowRestartMenu;
-        restartButton.clicked -= HandleRestart;
+        playerHealth.onRespawn -= HideRestartMenu;
+        timer.onCountChanged -= ShowCounter;
     }
 
     private void ShowRestartMenu()
@@ -36,12 +41,13 @@ public class UIDeathMenuController : MonoBehaviour
         container.style.display = DisplayStyle.Flex;
     }
 
-    private void HandleRestart()
+    private void HideRestartMenu()
     {
-        Time.timeScale = 1.0f;
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
-        );
+        container.style.display = DisplayStyle.None;
     }
 
+    private void ShowCounter(int count)
+    {
+        counter.text = count.ToString();
+    }
 }
