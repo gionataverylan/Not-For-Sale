@@ -6,14 +6,15 @@ public class EnemyAI : MonoBehaviour
     private Transform target;
     [SerializeField] private float attackRange = 3f;
     [SerializeField] private float attackCooldown = 2f;
-
     [SerializeField] private int damage = 25;
 
-    private enum EnemyState { Chase, Attack, Death };
+    private enum EnemyState { Chase, Attack, Death, Idle };
     private EnemyState currentState = EnemyState.Chase;
     private NavMeshAgent agent;
     private EnemyHealth enemyHealth;
     private float attackCooldownCounter;
+    private IDamageable targetDamageable;
+    private bool IsTargetDead => targetDamageable != null && targetDamageable.IsDead;
 
     private void Awake()
     {
@@ -33,21 +34,33 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        if (currentState == EnemyState.Death) return;
+        if (target == null) return;
+
+        if (IsTargetDead && currentState != EnemyState.Idle)
+        {
+            currentState = EnemyState.Idle;
+            agent.isStopped = true;
+            attackCooldownCounter = attackCooldown;
+        }
+
         switch (currentState)
         {
             case EnemyState.Chase: ChaseState(); break;
             case EnemyState.Attack: AttackState(); break;
-            case EnemyState.Death: return;
+            case EnemyState.Idle: IdleState(); break;
         }
     }
 
     private void ChaseState()
     {
+        Debug.Log("Chasing");
+        
         agent.SetDestination(target.position);
 
         float dist = Vector3.Distance(transform.position, target.position);
 
-        if (Vector3.Distance(transform.position, target.position) <= attackRange)
+        if (dist <= attackRange)
         {
             currentState = EnemyState.Attack;
             agent.isStopped = true;
@@ -56,7 +69,11 @@ public class EnemyAI : MonoBehaviour
 
     private void AttackState()
     {
-        if (Vector3.Distance(transform.position, target.position) > attackRange)
+        Debug.Log("Attacking");
+
+        float dist = Vector3.Distance(transform.position, target.position);
+
+        if (dist > attackRange)
         {
             currentState = EnemyState.Chase;
             agent.isStopped = false;
@@ -67,13 +84,19 @@ public class EnemyAI : MonoBehaviour
 
         if (attackCooldownCounter <= 0)
         {
-            if (target.TryGetComponent<IDamageable>(out IDamageable damageable))
-            {
-                damageable.TakeDamage(damage);
-            }
-
+            targetDamageable?.TakeDamage(damage);
             attackCooldownCounter = attackCooldown; 
         }
+    }
+
+    private void IdleState()
+    {
+        Debug.Log("Idle");
+
+        if (IsTargetDead) return;
+
+        currentState = EnemyState.Chase;
+        agent.isStopped = false;
     }
 
     private void HandleDeath()
@@ -87,5 +110,7 @@ public class EnemyAI : MonoBehaviour
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
+
+        target.TryGetComponent(out targetDamageable);
     }
 }

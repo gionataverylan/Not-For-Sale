@@ -6,6 +6,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     [SerializeField] private int maxHealth = 100;
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
+    public bool IsDead => isDead;
     private int currentHealth;
     private bool isDead;
     public event Action onDeath;

@@ -26,7 +26,9 @@ public class PlayerRespawn : MonoBehaviour
     private void Respawn()
     {
         characterController.enabled = false;
-        transform.position = respawnPoint.position;
+        transform.SetPositionAndRotation(
+            respawnPoint.position,
+            Quaternion.Euler(0f, respawnPoint.eulerAngles.y, 0f));
         characterController.enabled = true;
     }
 }
