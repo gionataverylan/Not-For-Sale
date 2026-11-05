@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="ContainerWave" style="flex-grow: 1; font-size: 32px; -unity-text-align: upper-center; justify-content: flex-end; align-items: flex-start; align-self: auto; align-content: flex-start; flex-direction: row;">
+        <ui:Label text="Волна номер: " name="Wave" selectable="true" focusable="true"/>
+        <ui:Label text="Label" name="WaveLabel"/>
+    </ui:VisualElement>
+    <ui:VisualElement name="ContainerEnemyCounter" style="flex-grow: 1; font-size: 32px; flex-direction: row; -unity-text-align: upper-center; text-overflow: clip; align-items: stretch; justify-content: flex-end; align-content: flex-start;">
+        <ui:Label text="Количество врагов:" name="Enemy"/>
+        <ui:Label text="Label" name="EnemiesLabel"/>
+    </ui:VisualElement>
+</ui:UXML>
