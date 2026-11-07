@@ -5,8 +5,8 @@ using Random = UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] GameObject enemy;
-    [SerializeField] Transform[] spawnPoints;
+    [SerializeField] private GameObject enemy;
+    [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private Transform target;
     [SerializeField] private int enemyCount;
     [SerializeField] private float pauseBetweenWaves;
@@ -34,10 +34,9 @@ public class EnemySpawner : MonoBehaviour
         GameObject enemyItem = Instantiate(enemy, point.position, point.rotation);
 
         EnemyAI enemyAI = enemyItem.GetComponent<EnemyAI>();
-
         EnemyHealth enemyHealth = enemyItem.GetComponent<EnemyHealth>();
-        enemyHealth.OnDeath += HandleDeathEnemy;
 
+        enemyHealth.OnDeath += HandleDeathEnemy;
         enemyAI.SetTarget(target);
     }
 
@@ -72,7 +71,5 @@ public class EnemySpawner : MonoBehaviour
     {
         aliveEnemies -= 1;
         onEnemyStarted?.Invoke(aliveEnemies);
-
-        Debug.Log(aliveEnemies);
     }
 }

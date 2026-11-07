@@ -3,17 +3,20 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    private Transform target;
     [SerializeField] private float attackRange = 3f;
     [SerializeField] private float attackCooldown = 2f;
     [SerializeField] private int damage = 25;
 
     private enum EnemyState { Chase, Attack, Death, Idle };
+
+
     private EnemyState currentState = EnemyState.Chase;
+    private Transform target;
+    private IDamageable targetDamageable;
     private NavMeshAgent agent;
     private EnemyHealth enemyHealth;
     private float attackCooldownCounter;
-    private IDamageable targetDamageable;
+
     private bool IsTargetDead => targetDamageable != null && targetDamageable.IsDead;
 
     private void Awake()
@@ -54,8 +57,6 @@ public class EnemyAI : MonoBehaviour
 
     private void ChaseState()
     {
-        Debug.Log("Chasing");
-        
         agent.SetDestination(target.position);
 
         float dist = Vector3.Distance(transform.position, target.position);
@@ -69,8 +70,6 @@ public class EnemyAI : MonoBehaviour
 
     private void AttackState()
     {
-        Debug.Log("Attacking");
-
         float dist = Vector3.Distance(transform.position, target.position);
 
         if (dist > attackRange)
@@ -91,8 +90,6 @@ public class EnemyAI : MonoBehaviour
 
     private void IdleState()
     {
-        Debug.Log("Idle");
-
         if (IsTargetDead) return;
 
         currentState = EnemyState.Chase;
@@ -102,7 +99,6 @@ public class EnemyAI : MonoBehaviour
     private void HandleDeath()
     {
         currentState = EnemyState.Death;
-
         agent.enabled = false;
         Destroy(gameObject);
     }
@@ -110,7 +106,6 @@ public class EnemyAI : MonoBehaviour
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
-
         target.TryGetComponent(out targetDamageable);
     }
 }

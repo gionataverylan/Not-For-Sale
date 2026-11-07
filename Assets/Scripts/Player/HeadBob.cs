@@ -2,14 +2,15 @@ using UnityEngine;
 
 public class HeadBob : MonoBehaviour
 {
+    private const float InputThreshold = 0.01f;
+
     [SerializeField] private float bobSmoothSpeed = 8f;
     [SerializeField] private float bobFrequency = 8f;
     [SerializeField] private float rollAmplitude = 1f;
     [SerializeField] private float pitchAmplitude = 1f;
     [SerializeField] private float sprintBobMultiplier = 1.5f;
-
     [SerializeField] private Transform bobPivot;
-    
+
     private PlayerMovement playerMovement;
     private PlayerInputReader playerInputReader;
 
@@ -25,7 +26,7 @@ public class HeadBob : MonoBehaviour
 
     private void LateUpdate()
     {
-            BobHead();
+        BobHead();
     }
 
     private void BobHead()
@@ -33,7 +34,7 @@ public class HeadBob : MonoBehaviour
         float targetRoll = 0f;
         float targetBobPitch = 0f;
 
-        bool isMoving = playerMovement.IsGrounded && playerInputReader.Move.magnitude > 0.01f;
+        bool isMoving = playerMovement.IsGrounded && playerInputReader.Move.magnitude > InputThreshold;
         float multiBobHead = playerMovement.IsSprinting ? sprintBobMultiplier : 1f;
 
         if (isMoving)

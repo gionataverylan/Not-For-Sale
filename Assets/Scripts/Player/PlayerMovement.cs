@@ -2,10 +2,12 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private const float GroundedVelocity = -2f;
+    private const float InputThreshold = 0.01f;
+
     [SerializeField] private float speed = 8f;
     [SerializeField] private float sprintSpeed = 12f;
     [SerializeField] private float dashSpeed = 20f;
-    [SerializeField] private float velocity = -2f;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpForce = 6f;
     [SerializeField] private float sprintJumpMultiplier = 10f;
@@ -14,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float fallMultiplier = 1.5f;
     [SerializeField] private float dashCooldown = 0.35f;
 
+    private float velocity = GroundedVelocity;
     private float jumpBufferCounter;
     private float airborneSpeed;
     private float dashTimerCounter;
@@ -71,7 +74,6 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveVector = dashTimerCounter > 0 ? dashDirection * dashSpeed : directionMove * horizontalSpeed;
 
         Vector3 direction = moveVector * Time.deltaTime;
-
         direction.y = ApplyGravity() * Time.deltaTime;
 
         characterController.Move(direction);
@@ -91,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
             dashTimerCounter = dashTimer;
             dashCooldownCounter = dashCooldown;
 
-            if (input.sqrMagnitude > 0.01f && characterController.isGrounded)
+            if (input.sqrMagnitude > InputThreshold && characterController.isGrounded)
             {
                 dashDirection = (transform.right * input.x + transform.forward * input.y).normalized;
             }
@@ -118,7 +120,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (characterController.isGrounded && velocity < 0)
         {
-            velocity = -2f;
+            velocity = GroundedVelocity;
         }
         else
         {
@@ -131,7 +133,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ResetAfterDeath()
     {
-        velocity = -2f;
+        velocity = GroundedVelocity;
         dashTimerCounter = 0f;
         dashCooldownCounter = 0f;
         jumpBufferCounter = 0f;

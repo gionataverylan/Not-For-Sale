@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class PlayerLook : MonoBehaviour
 {
-    [SerializeField] private float sensitivity = 0.4f;
+    private const float MaxPitch = 80f;
 
+    [SerializeField] private float sensitivity = 0.4f;
     [SerializeField] private Transform cameraTarget;
 
-    private float pitch = 0f;
-
+    private float pitch;
     private PlayerInputReader playerInputReader;
 
     private void Awake()
@@ -27,7 +27,7 @@ public class PlayerLook : MonoBehaviour
         transform.Rotate(Vector3.up * look.x * sensitivity);
 
         pitch -= look.y * sensitivity;
-        pitch = Mathf.Clamp(pitch, -80f, 80);
+        pitch = Mathf.Clamp(pitch, -MaxPitch, MaxPitch);
 
         cameraTarget.localEulerAngles = new Vector3(pitch, 0f, 0f);
     }

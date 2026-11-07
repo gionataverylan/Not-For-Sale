@@ -3,23 +3,21 @@ using UnityEngine.UIElements;
 
 public class UIWaveCounter : MonoBehaviour
 {
+    private UIDocument document;
     private EnemySpawner enemySpawner;
     private Label wave;
     private Label enemy;
-    private UIDocument document;
 
     private void Awake()
     {
-        enemySpawner = FindFirstObjectByType<EnemySpawner>();
         document = GetComponent<UIDocument>();
+        enemySpawner = FindFirstObjectByType<EnemySpawner>();
     }
 
     private void OnEnable()
     {
         wave = document.rootVisualElement.Q<Label>("WaveLabel");
         enemy = document.rootVisualElement.Q<Label>("EnemiesLabel");
-
-        Debug.Log(wave);
 
         enemySpawner.onWaveStarted += HandleChangeWave;
         enemySpawner.onEnemyStarted += HandleChangeEnemy;

@@ -1,17 +1,13 @@
 using System;
 using UnityEngine;
 
-public interface IDamageable
-{
-    void TakeDamage(int amount);
-    bool IsDead {  get; }
-}
-
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
     public event Action OnDeath;
-    private bool isDead;
+
     private int currentHealth = 100;
+    private bool isDead;
+
     public bool IsDead => isDead;
 
     public void TakeDamage(int amount)
@@ -19,7 +15,6 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if (isDead) return;
 
         currentHealth -= amount;
-        Debug.Log(currentHealth);
 
         if(currentHealth <= 0)
         {
