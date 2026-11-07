@@ -7,8 +7,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float attackCooldown = 2f;
     [SerializeField] private int damage = 25;
 
-    private enum EnemyState { Chase, Attack, Death, Idle };
-
+    private enum EnemyState { Chase, Attack, Death, Idle }
 
     private EnemyState currentState = EnemyState.Chase;
     private Transform target;
@@ -27,12 +26,12 @@ public class EnemyAI : MonoBehaviour
 
     private void OnEnable()
     {
-        enemyHealth.OnDeath += HandleDeath;
+        enemyHealth.Died += HandleDeath;
     }
 
     private void OnDisable()
     {
-        enemyHealth.OnDeath -= HandleDeath;
+        enemyHealth.Died -= HandleDeath;
     }
 
     private void Update()

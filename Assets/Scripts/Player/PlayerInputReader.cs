@@ -11,9 +11,9 @@ public class PlayerInputReader : MonoBehaviour
     public event Action Jumped;
     public event Action Dashed;
     public event Action Fired;
+
     public Vector2 Move => playerControler.Movement.Move.ReadValue<Vector2>();
     public Vector2 Look => playerControler.Movement.Look.ReadValue<Vector2>();
-
     public bool SprintPressed => playerControler.Movement.Sprint.IsPressed();
 
     private void Awake()
@@ -33,8 +33,8 @@ public class PlayerInputReader : MonoBehaviour
         playerCombat.Attack.Enable();
         playerCombat.Attack.Fire.performed += OnFire;
 
-        playerHealth.onDeath += HandleDeath;
-        playerHealth.onRespawn += HandleRespawn;
+        playerHealth.Died += HandleDeath;
+        playerHealth.Respawned += HandleRespawn;
     }
 
     private void OnDisable()
@@ -46,8 +46,8 @@ public class PlayerInputReader : MonoBehaviour
         playerCombat.Attack.Disable();
         playerCombat.Attack.Fire.performed -= OnFire;
 
-        playerHealth.onDeath -= HandleDeath;
-        playerHealth.onRespawn -= HandleRespawn;
+        playerHealth.Died -= HandleDeath;
+        playerHealth.Respawned -= HandleRespawn;
     }
 
     private void OnJump(InputAction.CallbackContext context)

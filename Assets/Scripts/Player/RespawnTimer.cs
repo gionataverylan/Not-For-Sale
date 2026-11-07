@@ -1,12 +1,15 @@
-using UnityEngine;
-using System.Collections;
 using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 public class RespawnTimer : MonoBehaviour
 {
-    [SerializeField] private int spawnTimer = 3;
+    [SerializeField, FormerlySerializedAs("spawnTimer")] private int respawnDelay = 3;
+
     private PlayerHealth playerHealth;
-    public event Action<int> onCountChanged;
+
+    public event Action<int> CountChanged;
 
     private void Awake()
     {
@@ -15,12 +18,12 @@ public class RespawnTimer : MonoBehaviour
 
     private void OnEnable()
     {
-        playerHealth.onDeath += StartCounter;    
+        playerHealth.Died += StartCounter;    
     }
 
     private void OnDisable()
     {
-        playerHealth.onDeath -= StartCounter;
+        playerHealth.Died -= StartCounter;
     }
 
     private void StartCounter()
@@ -30,9 +33,9 @@ public class RespawnTimer : MonoBehaviour
 
     private IEnumerator CounterRestart()
     {
-        for (int i = spawnTimer; i > 0; i--)
+        for (int i = respawnDelay; i > 0; i--)
         {
-            onCountChanged?.Invoke(i);
+            CountChanged?.Invoke(i);
             yield return new WaitForSeconds(1f);
         }
         

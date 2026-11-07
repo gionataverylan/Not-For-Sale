@@ -24,16 +24,16 @@ public class UIDeathMenuController : MonoBehaviour
 
         container.style.display = DisplayStyle.None;
 
-        playerHealth.onDeath += ShowRestartMenu;
-        playerHealth.onRespawn += HideRestartMenu;
-        timer.onCountChanged += ShowCounter;
+        playerHealth.Died += ShowRestartMenu;
+        playerHealth.Respawned += HideRestartMenu;
+        timer.CountChanged += ShowCounter;
 
     }
     private void OnDisable()
     {
-        playerHealth.onDeath -= ShowRestartMenu;
-        playerHealth.onRespawn -= HideRestartMenu;
-        timer.onCountChanged -= ShowCounter;
+        playerHealth.Died -= ShowRestartMenu;
+        playerHealth.Respawned -= HideRestartMenu;
+        timer.CountChanged -= ShowCounter;
     }
 
     private void ShowRestartMenu()

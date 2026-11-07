@@ -15,12 +15,12 @@ public class PlayerRespawn : MonoBehaviour
 
     private void OnEnable()
     {
-        playerHealth.onRespawn += Respawn;
+        playerHealth.Respawned += Respawn;
     }
 
     private void OnDisable()
     {
-        playerHealth.onRespawn -= Respawn;
+        playerHealth.Respawned -= Respawn;
     }
 
     private void Respawn()

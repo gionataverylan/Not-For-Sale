@@ -15,7 +15,7 @@ public class HUDController : MonoBehaviour
 
     private void OnEnable()
     {
-        playerHealth.onHealthChanged += HandleChangeHP;
+        playerHealth.HealthChanged += HandleChangeHP;
 
         healthBar = document.rootVisualElement.Q<ProgressBar>("HealthBar");
         healthBar.value = playerHealth.MaxHealth;
@@ -24,7 +24,7 @@ public class HUDController : MonoBehaviour
 
     private void OnDisable()
     {
-        playerHealth.onHealthChanged -= HandleChangeHP;
+        playerHealth.HealthChanged -= HandleChangeHP;
     }
 
     private void HandleChangeHP(int newHealth)

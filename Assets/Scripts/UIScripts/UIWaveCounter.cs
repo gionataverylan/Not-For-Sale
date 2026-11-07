@@ -19,13 +19,13 @@ public class UIWaveCounter : MonoBehaviour
         wave = document.rootVisualElement.Q<Label>("WaveLabel");
         enemy = document.rootVisualElement.Q<Label>("EnemiesLabel");
 
-        enemySpawner.onWaveStarted += HandleChangeWave;
-        enemySpawner.onEnemyStarted += HandleChangeEnemy;
+        enemySpawner.WaveStarted += HandleChangeWave;
+        enemySpawner.AliveEnemiesChanged += HandleChangeEnemy;
     }
     private void OnDisable()
     {
-        enemySpawner.onWaveStarted -= HandleChangeWave;
-        enemySpawner.onEnemyStarted -= HandleChangeEnemy;
+        enemySpawner.WaveStarted -= HandleChangeWave;
+        enemySpawner.AliveEnemiesChanged -= HandleChangeEnemy;
     }
 
     private void HandleChangeWave(int count)

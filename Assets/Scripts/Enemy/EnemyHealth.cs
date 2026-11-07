@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
-    public event Action OnDeath;
+    public event Action Died;
 
     private int currentHealth = 100;
     private bool isDead;
@@ -19,7 +19,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if(currentHealth <= 0)
         {
             isDead = true;
-            OnDeath?.Invoke();
+            Died?.Invoke();
         }
     }
 }

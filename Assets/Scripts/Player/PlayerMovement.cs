@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float dashSpeed = 20f;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpForce = 6f;
-    [SerializeField] private float sprintJumpMultiplier = 10f;
+    [SerializeField, FormerlySerializedAs("sprintJumpMultiplier")] private float sprintJumpForce = 10f;
     [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private float dashTimer = 0.15f;
     [SerializeField] private float fallMultiplier = 1.5f;
@@ -42,14 +43,14 @@ public class PlayerMovement : MonoBehaviour
     {
         playerInputReader.Jumped += OnJump;
         playerInputReader.Dashed += OnDash;
-        playerHealth.onRespawn += ResetAfterDeath;
+        playerHealth.Respawned += ResetAfterDeath;
     }
 
     private void OnDisable()
     {
         playerInputReader.Jumped -= OnJump;
         playerInputReader.Dashed -= OnDash;
-        playerHealth.onRespawn -= ResetAfterDeath;
+        playerHealth.Respawned -= ResetAfterDeath;
     }
 
     private void Update()
@@ -109,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (characterController.isGrounded && jumpBufferCounter > 0)
         {
-            velocity = isSprinting ? sprintJumpMultiplier : jumpForce;
+            velocity = isSprinting ? sprintJumpForce : jumpForce;
             airborneSpeed = isSprinting ? sprintSpeed : speed;
             jumpBufferCounter = 0f;
         }
