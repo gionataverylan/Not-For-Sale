@@ -361,14 +361,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f66fe67a518ad6041876dc2cb7599424, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  enemy: {fileID: 2455827201249875040, guid: 622b14d8f3b669a4cb9f4bad3ae79166, type: 3}
+  enemyPrefab: {fileID: 2455827201249875040, guid: 622b14d8f3b669a4cb9f4bad3ae79166, type: 3}
   spawnPoints:
   - {fileID: 1235957789}
   - {fileID: 1236116917}
   - {fileID: 556938743}
   - {fileID: 1921974636}
-  target: {fileID: 1819801385}
-  enemyCount: 10
+  player: {fileID: 1819801385}
+  baseEnemyCount: 10
   pauseBetweenWaves: 25
   spawnInterval: 2
 --- !u!1 &330585543
@@ -891,6 +891,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dc519797432af64f96e9870fa94f390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIWaveCounter
+  enemySpawner: {fileID: 305093385}
 --- !u!114 &570307803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -944,6 +945,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c5e27321307d648a423d6fa5cce97c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDController
+  playerHealth: {fileID: 1819801389}
 --- !u!114 &655077399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1562,6 +1564,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a070a4014b3b1e14f9d71d75a1d48302, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIDeathMenuController
+  playerHealth: {fileID: 1819801389}
+  respawnTimer: {fileID: 1819801394}
 --- !u!1 &1819801381
 GameObject:
   m_ObjectHideFlags: 0
@@ -1677,10 +1681,9 @@ MonoBehaviour:
   speed: 8
   sprintSpeed: 12
   dashSpeed: 12
-  velocity: -2
   gravity: -9.81
   jumpForce: 8
-  sprintJumpMultiplier: 10
+  sprintJumpForce: 10
   jumpBuffer: 0.2
   dashTimer: 0.15
   fallMultiplier: 2
@@ -1805,7 +1808,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e8507fe2c8952d489db7f6c40eeeeb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RespawnTimer
-  spawnTimer: 3
+  respawnDelay: 3
 --- !u!1 &1866507799
 GameObject:
   m_ObjectHideFlags: 0

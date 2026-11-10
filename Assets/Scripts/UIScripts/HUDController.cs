@@ -3,31 +3,39 @@ using UnityEngine.UIElements;
 
 public class HUDController : MonoBehaviour
 {
+    [SerializeField] private PlayerHealth playerHealth;
     private UIDocument document;
     private ProgressBar healthBar;
-    private PlayerHealth playerHealth;
 
     private void Awake()
     {
         document = GetComponent<UIDocument>();
-        playerHealth = FindFirstObjectByType<PlayerHealth>();
     }
 
     private void OnEnable()
     {
-        playerHealth.HealthChanged += HandleChangeHP;
+        if (playerHealth == null)
+        {
+            Debug.LogError("HUDController: не назначен playerHealth", this);
+            return;
+        }
 
         healthBar = document.rootVisualElement.Q<ProgressBar>("HealthBar");
         healthBar.value = playerHealth.MaxHealth;
         healthBar.highValue = playerHealth.MaxHealth;
+
+        playerHealth.HealthChanged += HandleHealthChanged;
     }
 
     private void OnDisable()
     {
-        playerHealth.HealthChanged -= HandleChangeHP;
+        if (playerHealth != null)
+        {
+            playerHealth.HealthChanged -= HandleHealthChanged;
+        }
     }
 
-    private void HandleChangeHP(int newHealth)
+    private void HandleHealthChanged(int newHealth)
     {
         healthBar.value = newHealth;
     }
