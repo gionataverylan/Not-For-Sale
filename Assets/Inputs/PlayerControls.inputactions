@@ -1,6 +1,6 @@
 {
     "version": 1,
-    "name": "PlayerControler",
+    "name": "PlayerControls",
     "maps": [
         {
             "name": "Movement",
@@ -149,6 +149,34 @@
                     "processors": "",
                     "groups": "",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Attack",
+            "id": "a93d9eaa-a832-4b74-9055-5507effb203d",
+            "actions": [
+                {
+                    "name": "Fire",
+                    "type": "Button",
+                    "id": "75cca262-ab67-4ab2-9d3d-e48fd13656e6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "cc6bab78-c4ef-4b2f-bdd5-fcd1b8175ca8",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
