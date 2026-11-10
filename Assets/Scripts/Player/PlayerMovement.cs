@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float velocity = GroundedVelocity;
     private float jumpBufferCounter;
+    private float lastGroundedSpeed;
     private float airborneSpeed;
     private float dashTimerCounter;
     private float dashCooldownCounter;
@@ -37,6 +38,8 @@ public class PlayerMovement : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         playerInputReader = GetComponent<PlayerInputReader>();
         playerHealth = GetComponent<PlayerHealth>();
+
+        lastGroundedSpeed = speed;
     }
 
     private void OnEnable()
@@ -56,23 +59,25 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         UpdateTimers();
-        OnMove();
+        HandleMovement();
         TryJump();
     }
 
-    private void OnMove()
+    private void HandleMovement()
     {
         Vector2 input = playerInputReader.Move;
         bool sprintPressed = playerInputReader.SprintPressed;
 
         isSprinting = sprintPressed && input.y > 0 && characterController.isGrounded;
 
-        float newSpeed = isSprinting ? sprintSpeed : speed;
-        float horizontalSpeed = characterController.isGrounded == false ? airborneSpeed : newSpeed;
+        if (characterController.isGrounded)
+        {
+            lastGroundedSpeed = isSprinting ? sprintSpeed : speed;
+        }
 
-        Vector3 directionMove = (transform.right * input.x + transform.forward * input.y);
+        Vector3 directionMove = transform.right * input.x + transform.forward * input.y;
 
-        Vector3 moveVector = dashTimerCounter > 0 ? dashDirection * dashSpeed : directionMove * horizontalSpeed;
+        Vector3 moveVector = dashTimerCounter > 0 ? dashDirection * dashSpeed : directionMove * lastGroundedSpeed;
 
         Vector3 direction = moveVector * Time.deltaTime;
         direction.y = ApplyGravity() * Time.deltaTime;
@@ -111,7 +116,6 @@ public class PlayerMovement : MonoBehaviour
         if (characterController.isGrounded && jumpBufferCounter > 0)
         {
             velocity = isSprinting ? sprintJumpForce : jumpForce;
-            airborneSpeed = isSprinting ? sprintSpeed : speed;
             jumpBufferCounter = 0f;
         }
     }
@@ -135,6 +139,7 @@ public class PlayerMovement : MonoBehaviour
     private void ResetAfterDeath()
     {
         velocity = GroundedVelocity;
+        lastGroundedSpeed = speed;
         dashTimerCounter = 0f;
         dashCooldownCounter = 0f;
         jumpBufferCounter = 0f;

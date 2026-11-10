@@ -106,5 +106,10 @@ public class EnemyAI : MonoBehaviour
     {
         target = newTarget;
         target.TryGetComponent(out targetDamageable);
+
+        if (target != null)
+        {
+            target.TryGetComponent(out targetDamageable);
+        }
     }
 }

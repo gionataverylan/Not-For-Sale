@@ -21,7 +21,19 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        if (!IsSetupValid()) return;
+
         StartCoroutine(WaveLoop());
+    }
+    private bool IsSetupValid()
+    {
+        if (enemyPrefab == null || player == null || spawnPoints == null || spawnPoints.Length == 0)
+        {
+            Debug.LogError("EnemySpawner: не заданы префаб врага, игрок или точки спавна. Волны не запущены.", this);
+            return false;
+        }
+
+        return true;
     }
 
     private Transform ChoosePosition()

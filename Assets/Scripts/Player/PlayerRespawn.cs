@@ -25,6 +25,12 @@ public class PlayerRespawn : MonoBehaviour
 
     private void Respawn()
     {
+        if (respawnPoint == null)
+        {
+            Debug.LogWarning("PlayerRespawn: respawnPoint не назначен, игрок остаётся на месте", this);
+            return;
+        }
+
         characterController.enabled = false;
         transform.SetPositionAndRotation(
             respawnPoint.position,
