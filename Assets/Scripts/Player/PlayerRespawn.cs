@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerRespawn : MonoBehaviour
+public class PlayerRespawn : NetworkBehaviour
 {
     [SerializeField] private Transform respawnPoint;
 
@@ -25,6 +26,8 @@ public class PlayerRespawn : MonoBehaviour
 
     private void Respawn()
     {
+        if (!IsOwner) return;
+
         if (respawnPoint == null)
         {
             Debug.LogWarning("PlayerRespawn: respawnPoint не назначен, игрок остаётся на месте", this);

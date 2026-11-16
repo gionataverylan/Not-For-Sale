@@ -14,6 +14,7 @@ public class PlayerNetworkSetup : NetworkBehaviour
         GetComponent<PlayerMovement>().enabled = isLocal;
         GetComponent<PlayerLook>().enabled = isLocal;
         GetComponent<HeadBob>().enabled = isLocal;
+        GetComponent<PlayerShooting>().enabled = isLocal;
 
         foreach (GameObject obj in localOnlyObjects)
         {

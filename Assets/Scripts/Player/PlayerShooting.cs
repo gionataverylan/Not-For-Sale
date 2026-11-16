@@ -1,39 +1,46 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerShooting : MonoBehaviour
+public class PlayerShooting : NetworkBehaviour
 {
+    [SerializeField] private Camera playerCamera;
     [SerializeField] private int damageAmount = 50;
+    [SerializeField] private float range = 100f;
 
-    private new Camera camera;
     private PlayerInputReader playerInputReader;
+    private PlayerHealth playerHealth;
 
     private void Awake()
     {
-        camera = Camera.main;
         playerInputReader = GetComponent<PlayerInputReader>();
+        playerHealth = GetComponent<PlayerHealth>();
     }
 
     private void OnEnable()
     {
-        playerInputReader.Fired += Shoot;
+        playerInputReader.Fired += OnFired;
     }
 
     private void OnDisable()
     {
-        playerInputReader.Fired -= Shoot;
+        playerInputReader.Fired -= OnFired;
     }
 
-    private void Shoot()
+    private void OnFired()
     {
-        RaycastHit hit;
+        Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+        FireRpc(ray.origin, ray.direction);
+    }
 
-        Ray ray = camera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
-        Debug.DrawRay(ray.origin, ray.direction * 20f, Color.red, 1f);
+    [Rpc(SendTo.Server)]
+    private void FireRpc(Vector3 origin, Vector3 direction)
+    {
+        if (playerHealth.IsDead) return;
 
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, range))
         {
-            if (hit.transform.TryGetComponent<IDamageable>(out IDamageable damageable))
-            { 
+            if (hit.transform.TryGetComponent(out IDamageable damageable))
+            {
                 damageable.TakeDamage(damageAmount);
             }
         }

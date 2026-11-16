@@ -8,7 +8,7 @@ public class NetworkTestUI : MonoBehaviour
         NetworkManager manager = NetworkManager.Singleton;
         if (manager == null) return;
 
-        GUILayout.BeginArea(new Rect(10, 10, 220, 120));
+        GUILayout.BeginArea(new Rect(10, 10, 220, 160));
 
         if (!manager.IsClient && !manager.IsServer)
         {
@@ -18,6 +18,13 @@ public class NetworkTestUI : MonoBehaviour
         else
         {
             GUILayout.Label(manager.IsHost ? "Host" : "Client");
+
+            NetworkObject localPlayer = manager.LocalClient?.PlayerObject;
+
+            if (localPlayer != null && localPlayer.TryGetComponent(out PlayerHealth health))
+            {
+                GUILayout.Label($"HP: {health.CurrentHealth} / {health.MaxHealth}");
+            }
         }
 
         GUILayout.EndArea();

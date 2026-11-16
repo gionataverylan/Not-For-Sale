@@ -1,49 +1,74 @@
 ﻿using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour, IDamageable
+public class PlayerHealth : NetworkBehaviour, IDamageable
 {
     [SerializeField] private int maxHealth = 100;
 
-    private int currentHealth;
-    private bool isDead;
+    private readonly NetworkVariable<int> currentHealth = new NetworkVariable<int>();
+    private readonly NetworkVariable<bool> isDead = new NetworkVariable<bool>();
 
     public event Action Died;
     public event Action Respawned;
     public event Action<int> HealthChanged;
 
     public int MaxHealth => maxHealth;
-    public int CurrentHealth => currentHealth;
-    public bool IsDead => isDead;
+    public int CurrentHealth => currentHealth.Value;
+    public bool IsDead => isDead.Value;
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
-        currentHealth = maxHealth;
+        currentHealth.OnValueChanged += HandleHealthChanged;
+        isDead.OnValueChanged += HandleDeadChanged;
+
+        if (IsServer)
+        {
+            currentHealth.Value = maxHealth;
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        currentHealth.OnValueChanged -= HandleHealthChanged;
+        isDead.OnValueChanged -= HandleDeadChanged;
     }
 
     public void TakeDamage(int amount)
     {
-        if(isDead) return;
+        if (!IsServer || isDead.Value) return;
 
-        currentHealth -= amount;
-        HealthChanged?.Invoke(currentHealth);
+        currentHealth.Value = Mathf.Max(0, currentHealth.Value - amount);
 
-        if(currentHealth <= 0)
+        if (currentHealth.Value <= 0)
         {
-            isDead = true;
-            Died?.Invoke();
+            isDead.Value = true;
         }
     }
 
     [ContextMenu("Respawn")]
     public void Respawn()
     {
-        if (!isDead) return;
+        if (!IsServer || !isDead.Value) return;
 
-        isDead = false;
-        currentHealth = maxHealth;
+        currentHealth.Value = maxHealth;
+        isDead.Value = false;
+    }
 
-        HealthChanged?.Invoke(currentHealth);
-        Respawned?.Invoke();
+    private void HandleHealthChanged(int previousValue, int newValue)
+    {
+        HealthChanged?.Invoke(newValue);
+    }
+
+    private void HandleDeadChanged(bool previousValue, bool newValue)
+    {
+        if (newValue)
+        {
+            Died?.Invoke();
+        }
+        else
+        {
+            Respawned?.Invoke();
+        }
     }
 }
