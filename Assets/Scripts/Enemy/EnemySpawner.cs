@@ -3,31 +3,47 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
+using Unity.Netcode;
 
-public class EnemySpawner : MonoBehaviour
+public class EnemySpawner : NetworkBehaviour
 {
     [SerializeField, FormerlySerializedAs("enemy")] private GameObject enemyPrefab;
     [SerializeField] private Transform[] spawnPoints;
-    [SerializeField, FormerlySerializedAs("target")] private Transform player;
     [SerializeField, FormerlySerializedAs("enemyCount")] private int baseEnemyCount;
     [SerializeField] private float pauseBetweenWaves;
     [SerializeField] private float spawnInterval;
 
-    private int currentWave;
-    private int aliveEnemies;
+    private readonly NetworkVariable<int> currentWave = new NetworkVariable<int>();
+    private readonly NetworkVariable<int> aliveEnemies = new NetworkVariable<int>();
 
     public event Action<int> WaveStarted;
     public event Action<int> AliveEnemiesChanged;
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        if (!IsSetupValid()) return;
+        currentWave.OnValueChanged += HandleWaveChanged;
+        aliveEnemies.OnValueChanged += HandleAliveEnemiesChanged;
 
-        StartCoroutine(WaveLoop());
+        WaveStarted?.Invoke(currentWave.Value);
+        AliveEnemiesChanged?.Invoke(aliveEnemies.Value);
+
+        if(IsServer && IsSetupValid())
+        {
+            StartCoroutine(WaveLoop());
+        }
     }
+
+    public override void OnNetworkDespawn()
+    {
+        currentWave.OnValueChanged -= HandleWaveChanged;
+        aliveEnemies.OnValueChanged -= HandleAliveEnemiesChanged;
+
+        StopAllCoroutines();
+    }
+
     private bool IsSetupValid()
     {
-        if (enemyPrefab == null || player == null || spawnPoints == null || spawnPoints.Length == 0)
+        if (enemyPrefab == null || spawnPoints == null || spawnPoints.Length == 0)
         {
             Debug.LogError("EnemySpawner: не заданы префаб врага, игрок или точки спавна. Волны не запущены.", this);
             return false;
@@ -46,11 +62,8 @@ public class EnemySpawner : MonoBehaviour
         Transform point = ChoosePosition();
         GameObject enemyItem = Instantiate(enemyPrefab, point.position, point.rotation);
 
-        EnemyAI enemyAI = enemyItem.GetComponent<EnemyAI>();
-        EnemyHealth enemyHealth = enemyItem.GetComponent<EnemyHealth>();
-
-        enemyHealth.Died += HandleDeathEnemy;
-        enemyAI.SetTarget(player);
+        enemyItem.GetComponent<NetworkObject>().Spawn();
+        enemyItem.GetComponent<EnemyHealth>().Died += HandleEnemyDied;
     }
 
     private IEnumerator Spawn(int count)
@@ -66,23 +79,30 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
-            currentWave += 1;
-            WaveStarted?.Invoke(currentWave);
+            currentWave.Value += 1;
 
-            int count = Mathf.Max(1, (int)((baseEnemyCount * currentWave) / 1.5f));
-            aliveEnemies = count;
-            AliveEnemiesChanged?.Invoke(aliveEnemies);
+            int count = Mathf.Max(1, (int)((baseEnemyCount * currentWave.Value) / 1.5f));
+            aliveEnemies.Value = count;
 
             StartCoroutine(Spawn(count));
 
-            yield return new WaitUntil(() => aliveEnemies <= 0);
+            yield return new WaitUntil(() => aliveEnemies.Value <= 0);
             yield return new WaitForSeconds(pauseBetweenWaves);
         }
     }
 
-    private void HandleDeathEnemy()
+    private void HandleEnemyDied()
     {
-        aliveEnemies -= 1;
-        AliveEnemiesChanged?.Invoke(aliveEnemies);
+        aliveEnemies.Value -= 1;
+    }
+
+    private void HandleWaveChanged(int previousValue, int newValue)
+    {
+        WaveStarted?.Invoke(newValue);
+    }
+
+    private void HandleAliveEnemiesChanged(int previousValue, int newValue)
+    {
+        AliveEnemiesChanged?.Invoke(newValue);
     }
 }

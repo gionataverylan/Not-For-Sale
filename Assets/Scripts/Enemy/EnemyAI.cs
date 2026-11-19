@@ -1,11 +1,13 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : NetworkBehaviour
 {
     [SerializeField] private float attackRange = 3f;
     [SerializeField] private float attackCooldown = 2f;
     [SerializeField] private int damage = 25;
+    [SerializeField] private float targetRefreshInterval = 0.5f;
 
     private enum EnemyState { Chase, Attack, Death, Idle }
 
@@ -15,8 +17,7 @@ public class EnemyAI : MonoBehaviour
     private NavMeshAgent agent;
     private EnemyHealth enemyHealth;
     private float attackCooldownCounter;
-
-    private bool IsTargetDead => targetDamageable != null && targetDamageable.IsDead;
+    private float targetRefreshCounter;
 
     private void Awake()
     {
@@ -24,9 +25,24 @@ public class EnemyAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
-    private void OnEnable()
+    public override void OnNetworkSpawn()
     {
+        if (!IsServer)
+        {
+            agent.enabled = false;
+            enabled = false;
+            return;
+        }
+
         enemyHealth.Died += HandleDeath;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsServer)
+        {
+            enemyHealth.Died -= HandleDeath;
+        }
     }
 
     private void OnDisable()
@@ -37,21 +53,73 @@ public class EnemyAI : MonoBehaviour
     private void Update()
     {
         if (currentState == EnemyState.Death) return;
-        if (target == null) return;
 
-        if (IsTargetDead && currentState != EnemyState.Idle)
+        RefreshTarget();
+
+        if (target == null)
+        {
+            EnterIdle();
+            return;
+        }
+
+        if (currentState == EnemyState.Idle)
         {
             currentState = EnemyState.Idle;
-            agent.isStopped = true;
-            attackCooldownCounter = attackCooldown;
+            agent.isStopped = false;
         }
 
         switch (currentState)
         {
             case EnemyState.Chase: ChaseState(); break;
             case EnemyState.Attack: AttackState(); break;
-            case EnemyState.Idle: IdleState(); break;
         }
+    }
+
+    private void RefreshTarget()
+    {
+        targetRefreshCounter -= Time.deltaTime;
+
+        bool targetLost = target == null || (targetDamageable != null && targetDamageable.IsDead);
+
+        if (targetRefreshCounter > 0f && !targetLost) return;
+
+        targetRefreshCounter = targetRefreshInterval;
+        FindNearestPlayer();
+    }
+
+    private void FindNearestPlayer()
+    {
+        target = null;
+        targetDamageable = null;
+        
+        float bestDistance = float.MaxValue;
+
+        foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            NetworkObject playerObject = client.PlayerObject;
+
+            if (playerObject == null) continue;
+            if (!playerObject.TryGetComponent(out IDamageable damageable)) continue;
+            if (damageable.IsDead) continue;
+
+            float distance = Vector3.Distance(transform.position, playerObject.transform.position);
+
+            if(distance < bestDistance)
+            {
+                bestDistance = distance;
+                target = playerObject.transform;
+                targetDamageable = damageable;
+            }
+        }
+    }
+
+    private void EnterIdle()
+    {
+        if(currentState == EnemyState.Idle) return;
+
+        currentState = EnemyState.Idle;
+        agent.isStopped = true;
+        attackCooldownCounter = attackCooldown;
     }
 
     private void ChaseState()
@@ -87,29 +155,10 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private void IdleState()
-    {
-        if (IsTargetDead) return;
-
-        currentState = EnemyState.Chase;
-        agent.isStopped = false;
-    }
-
     private void HandleDeath()
     {
         currentState = EnemyState.Death;
         agent.enabled = false;
-        Destroy(gameObject);
-    }
-
-    public void SetTarget(Transform newTarget)
-    {
-        target = newTarget;
-        target.TryGetComponent(out targetDamageable);
-
-        if (target != null)
-        {
-            target.TryGetComponent(out targetDamageable);
-        }
+        NetworkObject.Despawn();
     }
 }
