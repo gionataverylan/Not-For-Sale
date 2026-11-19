@@ -9,9 +9,9 @@ public class EnemyAI : NetworkBehaviour
     [SerializeField] private int damage = 25;
     [SerializeField] private float targetRefreshInterval = 0.5f;
 
-    private enum EnemyState { Chase, Attack, Death, Idle }
+    private enum EnemyState { Chase, Attack, Idle, Death }
 
-    private EnemyState currentState = EnemyState.Chase;
+    private EnemyState currentState = EnemyState.Idle;
     private Transform target;
     private IDamageable targetDamageable;
     private NavMeshAgent agent;
@@ -45,11 +45,6 @@ public class EnemyAI : NetworkBehaviour
         }
     }
 
-    private void OnDisable()
-    {
-        enemyHealth.Died -= HandleDeath;
-    }
-
     private void Update()
     {
         if (currentState == EnemyState.Death) return;
@@ -64,7 +59,7 @@ public class EnemyAI : NetworkBehaviour
 
         if (currentState == EnemyState.Idle)
         {
-            currentState = EnemyState.Idle;
+            currentState = EnemyState.Chase;
             agent.isStopped = false;
         }
 
@@ -91,7 +86,7 @@ public class EnemyAI : NetworkBehaviour
     {
         target = null;
         targetDamageable = null;
-        
+
         float bestDistance = float.MaxValue;
 
         foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
@@ -104,7 +99,7 @@ public class EnemyAI : NetworkBehaviour
 
             float distance = Vector3.Distance(transform.position, playerObject.transform.position);
 
-            if(distance < bestDistance)
+            if (distance < bestDistance)
             {
                 bestDistance = distance;
                 target = playerObject.transform;
@@ -115,7 +110,7 @@ public class EnemyAI : NetworkBehaviour
 
     private void EnterIdle()
     {
-        if(currentState == EnemyState.Idle) return;
+        if (currentState == EnemyState.Idle) return;
 
         currentState = EnemyState.Idle;
         agent.isStopped = true;
@@ -148,10 +143,10 @@ public class EnemyAI : NetworkBehaviour
 
         attackCooldownCounter -= Time.deltaTime;
 
-        if (attackCooldownCounter <= 0)
+        if (attackCooldownCounter <= 0f)
         {
             targetDamageable?.TakeDamage(damage);
-            attackCooldownCounter = attackCooldown; 
+            attackCooldownCounter = attackCooldown;
         }
     }
 

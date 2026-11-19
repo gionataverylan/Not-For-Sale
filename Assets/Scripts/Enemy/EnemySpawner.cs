@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
-using Unity.Netcode;
 
 public class EnemySpawner : NetworkBehaviour
 {
@@ -27,7 +27,7 @@ public class EnemySpawner : NetworkBehaviour
         WaveStarted?.Invoke(currentWave.Value);
         AliveEnemiesChanged?.Invoke(aliveEnemies.Value);
 
-        if(IsServer && IsSetupValid())
+        if (IsServer && IsSetupValid())
         {
             StartCoroutine(WaveLoop());
         }
@@ -45,7 +45,7 @@ public class EnemySpawner : NetworkBehaviour
     {
         if (enemyPrefab == null || spawnPoints == null || spawnPoints.Length == 0)
         {
-            Debug.LogError("EnemySpawner: не заданы префаб врага, игрок или точки спавна. Волны не запущены.", this);
+            Debug.LogError("EnemySpawner: не заданы префаб врага или точки спавна. Волны не запущены.", this);
             return false;
         }
 
@@ -68,7 +68,7 @@ public class EnemySpawner : NetworkBehaviour
 
     private IEnumerator Spawn(int count)
     {
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             yield return new WaitForSeconds(spawnInterval);
             CreateEnemy();

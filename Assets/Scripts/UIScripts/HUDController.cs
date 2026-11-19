@@ -21,8 +21,8 @@ public class HUDController : MonoBehaviour
         }
 
         healthBar = document.rootVisualElement.Q<ProgressBar>("HealthBar");
-        healthBar.value = playerHealth.MaxHealth;
         healthBar.highValue = playerHealth.MaxHealth;
+        healthBar.value = playerHealth.CurrentHealth;
 
         playerHealth.HealthChanged += HandleHealthChanged;
     }

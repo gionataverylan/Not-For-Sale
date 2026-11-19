@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class RespawnTimer : MonoBehaviour
+public class RespawnTimer : NetworkBehaviour
 {
-    [SerializeField, FormerlySerializedAs("spawnTimer")] private int respawnDelay = 3;
+    [SerializeField] private int respawnDelay = 3;
+
+    private readonly NetworkVariable<int> secondsLeft = new NetworkVariable<int>();
 
     private PlayerHealth playerHealth;
 
@@ -16,29 +18,45 @@ public class RespawnTimer : MonoBehaviour
         playerHealth = GetComponent<PlayerHealth>();
     }
 
-    private void OnEnable()
+    public override void OnNetworkSpawn()
     {
-        playerHealth.Died += StartCounter;    
+        secondsLeft.OnValueChanged += HandleSecondsChanged;
+
+        if (IsServer)
+        {
+            playerHealth.Died += StartCountdown;
+        }
     }
 
-    private void OnDisable()
+    public override void OnNetworkDespawn()
     {
-        playerHealth.Died -= StartCounter;
+        secondsLeft.OnValueChanged -= HandleSecondsChanged;
+
+        if (IsServer)
+        {
+            playerHealth.Died -= StartCountdown;
+        }
     }
 
-    private void StartCounter()
+    private void StartCountdown()
     {
-        StartCoroutine(CounterRestart());
+        StartCoroutine(CountdownRoutine());
     }
 
-    private IEnumerator CounterRestart()
+    private IEnumerator CountdownRoutine()
     {
         for (int i = respawnDelay; i > 0; i--)
         {
-            CountChanged?.Invoke(i);
+            secondsLeft.Value = i;
             yield return new WaitForSeconds(1f);
         }
-        
+
         playerHealth.Respawn();
+        secondsLeft.Value = 0;
+    }
+
+    private void HandleSecondsChanged(int previousValue, int newValue)
+    {
+        CountChanged?.Invoke(newValue);
     }
 }
